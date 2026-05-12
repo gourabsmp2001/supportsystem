@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color: #172033;
+  background: #f7fafc;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+input,
+select,
+textarea {
+  @apply w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-100;
+}
+
+label {
+  @apply text-xs font-semibold uppercase tracking-wide text-slate-500;
+}
+
+button {
+  @apply transition;
+}
+
+.table-scroll {
+  scrollbar-width: thin;
+}
+
+/* Toast slide-in animation */
+@keyframes slide-in-from-right {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-in.slide-in-from-right {
+  animation: slide-in-from-right 0.3s ease-out;
+}
