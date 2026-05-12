@@ -42,10 +42,10 @@ export default function Login() {
               Retail visits, sales entries, photos, and Excel reports in one place.
             </h2>
             <p className="mt-5 max-w-xl text-lg text-slate-200">
-              Built for mobile shop visits and monthly reporting, with Supabase Auth, PostgreSQL, Storage, and Vercel-ready hosting.
+              Built for mobile shop visits and monthly reporting.
             </p>
           </div>
-          <p className="text-sm text-slate-300">Free hosting architecture: Vercel + Supabase free plan.</p>
+
         </section>
 
         <section className="flex items-center justify-center bg-white p-5 text-ink">
@@ -56,7 +56,7 @@ export default function Login() {
               </div>
               <div>
                 <h2 className="text-xl font-bold">Admin Login</h2>
-                <p className="text-sm text-slate-500">Use your Supabase Auth user.</p>
+                <p className="text-sm text-slate-500">Sign in to your account.</p>
               </div>
             </div>
             <div className="space-y-4">
