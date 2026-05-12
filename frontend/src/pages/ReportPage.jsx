@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import DataTable from '../components/DataTable';
 import ExportButton from '../components/ExportButton';
 import FormModal from '../components/FormModal';
-import MonthFilter from '../components/MonthFilter';
+import CalendarFilter from '../components/CalendarFilter';
 import SearchFilter from '../components/SearchFilter';
 import { toast } from '../components/Toast';
 import { invalidateEntityCache, useEntityOptions } from '../hooks/useEntityOptions';
@@ -19,7 +19,15 @@ export default function ReportPage({ moduleKey, config }) {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [month, setMonth] = useState(config.monthField ? currentMonth() : '');
+  const filterType = config.filterType || 'month';
+  const filterField = config.filterField || config.monthField;
+  const initialValue = useMemo(() => {
+    if (!filterField) return '';
+    const now = new Date().toISOString();
+    return filterType === 'date' ? now.slice(0, 10) : now.slice(0, 7);
+  }, [filterField, filterType]);
+
+  const [filterValue, setFilterValue] = useState(initialValue);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const { retailers, brands, loading: entityLoading } = useEntityOptions();
@@ -43,8 +51,8 @@ export default function ReportPage({ moduleKey, config }) {
     setLoading(true);
     let query = supabase.from(moduleKey).select('*').order('created_at', { ascending: false }).limit(500);
 
-    if (config.monthField && month) {
-      query = query.eq(config.monthField, month);
+    if (filterField && filterValue) {
+      query = query.eq(filterField, filterValue);
     }
 
     if (search.trim() && searchColumns.length) {
@@ -60,7 +68,7 @@ export default function ReportPage({ moduleKey, config }) {
       setRows(data || []);
     }
     setLoading(false);
-  }, [config.monthField, moduleKey, month, search, searchColumns]);
+  }, [filterField, moduleKey, filterValue, search, searchColumns]);
 
   useEffect(() => {
     loadRows();
@@ -135,7 +143,7 @@ export default function ReportPage({ moduleKey, config }) {
   }
 
   function exportRows() {
-    downloadExcel({ title: config.title, columns, rows, month });
+    downloadExcel({ title: config.title, columns, rows, month: filterValue });
     toast.success('Excel file downloaded!');
   }
 
@@ -171,7 +179,7 @@ export default function ReportPage({ moduleKey, config }) {
       <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-soft">
         <div className="flex flex-col gap-3 sm:flex-row">
           <SearchFilter value={search} onChange={setSearch} />
-          <MonthFilter value={month} onChange={setMonth} disabled={!config.monthField} />
+          <CalendarFilter value={filterValue} onChange={setFilterValue} disabled={!filterField} type={filterType} />
         </div>
       </section>
 

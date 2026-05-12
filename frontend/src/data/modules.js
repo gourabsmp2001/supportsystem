@@ -143,6 +143,8 @@ export const moduleConfigs = {
     shortTitle: 'Opening Stock',
     icon: Boxes,
     monthField: 'month',
+    filterField: 'date',
+    filterType: 'date',
     primaryField: 'retail_name',
     description: 'Record date-wise opening stock by brand and bottle size.',
     fields: [
@@ -211,6 +213,8 @@ export const moduleConfigs = {
     shortTitle: 'Retail Visits',
     icon: ImagePlus,
     monthField: 'visit_month',
+    filterField: 'visit_date',
+    filterType: 'date',
     primaryField: 'retail_name',
     description: 'Log visit notes, next follow-up, status, and shop photos.',
     fields: [
@@ -232,6 +236,8 @@ export const moduleConfigs = {
     shortTitle: 'PJP',
     icon: MapPinned,
     monthField: 'month',
+    filterField: 'date',
+    filterType: 'date',
     primaryField: 'planned_retail_name',
     description: 'Plan and track daily retail visits.',
     fields: [
