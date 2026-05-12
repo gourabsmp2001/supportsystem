@@ -1,7 +1,7 @@
 import { Edit2, Trash2 } from 'lucide-react';
 import { formatValue } from '../lib/format';
 
-export default function DataTable({ columns, rows, onEdit, onDelete }) {
+export default function DataTable({ columns, rows, onEdit, onDelete, emptyMessage = 'No records found.' }) {
   return (
     <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-soft">
       <div className="table-scroll overflow-x-auto">
@@ -44,7 +44,7 @@ export default function DataTable({ columns, rows, onEdit, onDelete }) {
             ) : (
               <tr>
                 <td colSpan={columns.length + 1} className="px-4 py-10 text-center text-slate-500">
-                  No records found.
+                  {emptyMessage}
                 </td>
               </tr>
             )}

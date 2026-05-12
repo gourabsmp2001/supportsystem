@@ -6,7 +6,7 @@ import FormModal from '../components/FormModal';
 import MonthFilter from '../components/MonthFilter';
 import SearchFilter from '../components/SearchFilter';
 import { toast } from '../components/Toast';
-import { invalidateEntityCache } from '../hooks/useEntityOptions';
+import { invalidateEntityCache, useEntityOptions } from '../hooks/useEntityOptions';
 import { calculateRecord } from '../lib/calculations';
 import { downloadExcel } from '../lib/exportExcel';
 import { currentMonth } from '../lib/format';
@@ -22,6 +22,7 @@ export default function ReportPage({ moduleKey, config }) {
   const [month, setMonth] = useState(config.monthField ? currentMonth() : '');
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
+  const { retailers, brands, loading: entityLoading } = useEntityOptions();
 
   const columns = useMemo(
     () => config.fields.filter((field) => !hiddenColumns.has(field.name) && field.type !== 'photo').map(({ name, label }) => ({ name, label })).concat(
@@ -138,6 +139,9 @@ export default function ReportPage({ moduleKey, config }) {
     toast.success('Excel file downloaded!');
   }
 
+  const needsRetailers = config.fields.some((field) => field.lookup === 'retailer');
+  const needsBrands = config.fields.some((field) => field.lookup === 'brand' && field.required);
+
   return (
     <div className="space-y-5">
       <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-soft">
@@ -171,10 +175,28 @@ export default function ReportPage({ moduleKey, config }) {
         </div>
       </section>
 
+      {!entityLoading && needsRetailers && !retailers.length ? (
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+          Retail List is empty. Import shop names first.
+        </div>
+      ) : null}
+
+      {!entityLoading && needsBrands && !brands.length ? (
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+          Brand List is empty. Import brand names first.
+        </div>
+      ) : null}
+
       {loading ? (
         <div className="rounded-lg border border-slate-200 bg-white p-10 text-center font-semibold text-slate-500 shadow-soft">Loading records...</div>
       ) : (
-        <DataTable columns={columns} rows={rows} onEdit={openEdit} onDelete={deleteRecord} />
+        <DataTable
+          columns={columns}
+          rows={rows}
+          onEdit={openEdit}
+          onDelete={deleteRecord}
+          emptyMessage="No entries found. Add a new entry or generate a template."
+        />
       )}
 
       <FormModal

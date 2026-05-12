@@ -7,6 +7,9 @@ import { navModules } from '../data/modules';
 import { supabase } from '../lib/supabaseClient';
 import Backup from './Backup';
 import Dashboard from './Dashboard';
+import Help from './Help';
+import ImportData from './ImportData';
+import ReportTemplates from './ReportTemplates';
 import ReportPage from './ReportPage';
 
 export default function App() {
@@ -52,6 +55,9 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/backup" element={<Backup />} />
+            <Route path="/import-data" element={<ImportData />} />
+            <Route path="/report-templates" element={<ReportTemplates />} />
+            <Route path="/help" element={<Help />} />
             {navModules.map((module) => (
               <Route key={module.key} path={module.path} element={<ReportPage moduleKey={module.key} config={module} />} />
             ))}

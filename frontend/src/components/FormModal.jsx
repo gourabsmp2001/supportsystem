@@ -2,12 +2,21 @@ import { Loader2, Save, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useEntityOptions } from '../hooks/useEntityOptions';
 import { calculateRecord } from '../lib/calculations';
+import { currentMonth } from '../lib/format';
 import PhotoUploader from './PhotoUploader';
 import SearchableSelect from './SearchableSelect';
 
 function initialValues(fields) {
   return fields.reduce((acc, field) => {
-    acc[field.name] = field.type === 'number' ? 0 : '';
+    if (field.defaultValue !== undefined) {
+      acc[field.name] = typeof field.defaultValue === 'function' ? field.defaultValue() : field.defaultValue;
+    } else if (field.type === 'month') {
+      acc[field.name] = currentMonth();
+    } else if (field.type === 'date') {
+      acc[field.name] = new Date().toISOString().slice(0, 10);
+    } else {
+      acc[field.name] = field.type === 'number' ? 0 : '';
+    }
     return acc;
   }, {});
 }
@@ -15,7 +24,7 @@ function initialValues(fields) {
 export default function FormModal({ open, title, moduleKey, fields, record, onClose, onSubmit }) {
   const [values, setValues] = useState(initialValues(fields));
   const [saving, setSaving] = useState(false);
-  const { retailers, brands } = useEntityOptions();
+  const { retailers, brands, loading: entityLoading } = useEntityOptions();
 
   useEffect(() => {
     const seed = record ? { ...initialValues(fields), ...record } : initialValues(fields);
@@ -29,6 +38,12 @@ export default function FormModal({ open, title, moduleKey, fields, record, onCl
     if (lookup === 'retailer') return retailers;
     if (lookup === 'brand') return brands;
     return [];
+  }
+
+  function getEmptyMessage(lookup) {
+    if (lookup === 'retailer') return 'Please import or add Retail List first.';
+    if (lookup === 'brand') return 'Please import or add Brand List first.';
+    return 'No options found';
   }
 
   function setValue(name, value) {
@@ -68,14 +83,21 @@ export default function FormModal({ open, title, moduleKey, fields, record, onCl
               </label>
               <div className="mt-1">
                 {field.lookup ? (
-                  <SearchableSelect
-                    id={field.name}
-                    value={values[field.name] || ''}
-                    options={getOptions(field.lookup)}
-                    onChange={(val) => setValue(field.name, val)}
-                    placeholder={`Select ${field.label}...`}
-                    required={field.required}
-                  />
+                  <>
+                    <SearchableSelect
+                      id={field.name}
+                      value={values[field.name] || ''}
+                      options={getOptions(field.lookup)}
+                      onChange={(val) => setValue(field.name, val)}
+                      placeholder={entityLoading ? 'Loading master list...' : `Select ${field.label}...`}
+                      required={field.required}
+                      disabled={entityLoading || !getOptions(field.lookup).length}
+                      emptyMessage={getEmptyMessage(field.lookup)}
+                    />
+                    {!entityLoading && !getOptions(field.lookup).length ? (
+                      <p className="mt-1 text-xs font-semibold text-red-700">{getEmptyMessage(field.lookup)}</p>
+                    ) : null}
+                  </>
                 ) : field.type === 'select' ? (
                   <select id={field.name} required={field.required} value={values[field.name] || ''} onChange={(event) => setValue(field.name, event.target.value)}>
                     <option value="">Select</option>

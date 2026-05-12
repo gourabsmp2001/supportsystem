@@ -169,6 +169,7 @@ create table if not exists retail_visit_entries (
   visit_date date not null,
   visit_month text,
   retail_name text not null,
+  brand_name text,
   executive_name text,
   area text,
   visit_purpose text,
@@ -190,6 +191,7 @@ create table if not exists pjp_entries (
   executive_name text,
   area text,
   planned_retail_name text not null,
+  brand_name text,
   visit_status text default 'Planned',
   remarks text,
   created_at timestamptz default now(),
@@ -197,6 +199,12 @@ create table if not exists pjp_entries (
 );
 
 alter table pjp_entries enable row level security;
+
+alter table retail_visit_entries
+add column if not exists brand_name text;
+
+alter table pjp_entries
+add column if not exists brand_name text;
 
 create index if not exists idx_sss_month on sss_sales_entries(month);
 create index if not exists idx_availability_month on availability_entries(month);

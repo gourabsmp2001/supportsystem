@@ -9,9 +9,10 @@ Support System is a Vercel-ready liquor sales reporting dashboard for retail vis
 - Database: Supabase PostgreSQL free plan
 - Auth: Supabase Auth
 - Storage: Supabase Storage bucket named `retail-visit-photos`
-- Excel export: browser-side `.xlsx` files using SheetJS
+- Excel export: browser-side `.xlsx` files using ExcelJS
+- Master data import: browser-side Excel/CSV parsing with `xlsx`
 
-No Express backend is required for normal app usage.
+No Express backend is required for app usage.
 
 ## Local Setup
 
@@ -58,6 +59,22 @@ The schema also enables RLS and creates policies for authenticated CRUD access.
 ## Supabase Storage
 
 The schema creates a public bucket named `retail-visit-photos` and policies for authenticated uploads, updates, and deletes. Retail visit photos are uploaded from the browser and the public URL is saved in `retail_visit_entries.photo_url`.
+
+## Import Data
+
+Use the `Import Data` page after login to import:
+
+- Retail List
+- Brand List
+- Brand MRP
+
+Choose an `.xlsx`, `.xls`, or `.csv` file. The file is parsed in the browser only and is not uploaded to Supabase. The page shows a preview, inserted count, duplicate count, and invalid count before final import.
+
+Duplicate handling:
+
+- Retail List: skips rows where `retail_name` already exists, ignoring case and extra spaces.
+- Brand List: skips rows where `brand_name` already exists, ignoring case and extra spaces.
+- Brand MRP: skips rows where `brand_name + bottle_size + effective_month` already exists, ignoring case and extra spaces.
 
 ## Vercel Deployment
 

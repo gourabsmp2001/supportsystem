@@ -1,6 +1,6 @@
 import { Database, LogOut, Menu, ShieldCheck, X } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
-import { navModules } from '../data/modules';
+import { navModules, utilityPages } from '../data/modules';
 
 export default function Sidebar({ open, onClose, onToggle, onLogout }) {
   return (
@@ -58,6 +58,22 @@ export default function Sidebar({ open, onClose, onToggle, onLogout }) {
           ))}
 
           <hr className="my-3 border-slate-200" />
+
+          {utilityPages.map(({ path, shortTitle, icon: Icon }) => (
+            <NavLink
+              key={path}
+              to={path}
+              onClick={onClose}
+              className={({ isActive }) =>
+                `flex items-center gap-3 rounded-md px-3 py-2 text-sm font-semibold ${
+                  isActive ? 'bg-red-700 text-white' : 'text-slate-700 hover:bg-slate-100'
+                }`
+              }
+            >
+              <Icon size={18} />
+              {shortTitle}
+            </NavLink>
+          ))}
 
           <NavLink
             to="/backup"

@@ -6,9 +6,13 @@ let cache = { retailers: null, brands: null };
 export function useEntityOptions() {
   const [retailers, setRetailers] = useState(cache.retailers || []);
   const [brands, setBrands] = useState(cache.brands || []);
+  const [loading, setLoading] = useState(!cache.retailers || !cache.brands);
 
   useEffect(() => {
+    let active = true;
+
     async function load() {
+      setLoading(true);
       if (!cache.retailers) {
         const { data } = await supabase
           .from('retailers')
@@ -17,7 +21,7 @@ export function useEntityOptions() {
           .order('retail_name');
         const names = [...new Set((data || []).map((r) => r.retail_name).filter(Boolean))];
         cache.retailers = names;
-        setRetailers(names);
+        if (active) setRetailers(names);
       }
 
       if (!cache.brands) {
@@ -28,13 +32,22 @@ export function useEntityOptions() {
           .order('brand_name');
         const names = [...new Set((data || []).map((b) => b.brand_name).filter(Boolean))];
         cache.brands = names;
-        setBrands(names);
+        if (active) setBrands(names);
+      }
+
+      if (active) {
+        setRetailers(cache.retailers || []);
+        setBrands(cache.brands || []);
+        setLoading(false);
       }
     }
     load();
+    return () => {
+      active = false;
+    };
   }, []);
 
-  return { retailers, brands };
+  return { retailers, brands, loading };
 }
 
 export function invalidateEntityCache() {

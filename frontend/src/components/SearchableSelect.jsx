@@ -1,7 +1,7 @@
 import { ChevronDown, Search, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
-export default function SearchableSelect({ id, value, options, onChange, placeholder = 'Select...', required = false, disabled = false }) {
+export default function SearchableSelect({ id, value, options, onChange, placeholder = 'Select...', required = false, disabled = false, emptyMessage = 'No options found' }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const containerRef = useRef(null);
@@ -103,7 +103,7 @@ export default function SearchableSelect({ id, value, options, onChange, placeho
                 </li>
               ))
             ) : (
-              <li className="px-3 py-3 text-center text-sm text-slate-400">No matches found</li>
+              <li className="px-3 py-3 text-center text-sm text-slate-400">{query.trim() ? 'No matches found' : emptyMessage}</li>
             )}
           </ul>
         </div>

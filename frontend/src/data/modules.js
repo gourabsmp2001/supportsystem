@@ -6,6 +6,9 @@ import {
   ClipboardList,
   FileSpreadsheet,
   ImagePlus,
+  LayoutTemplate,
+  Upload,
+  CircleHelp,
   MapPinned,
   PackageCheck,
   Percent,
@@ -37,7 +40,7 @@ export const moduleConfigs = {
       { name: 'area', label: 'Area', type: 'text' },
       { name: 'contact_person', label: 'Contact Person', type: 'text' },
       { name: 'phone', label: 'Phone', type: 'tel' },
-      { name: 'status', label: 'Status', type: 'select', options: ['Active', 'Inactive'] }
+      { name: 'status', label: 'Status', type: 'select', options: ['Active', 'Inactive'], defaultValue: 'Active' }
     ]
   },
   brands: {
@@ -53,7 +56,7 @@ export const moduleConfigs = {
       { name: 'brand_id', label: 'Brand ID', type: 'text', required: true },
       { name: 'brand_name', label: 'Brand Name', type: 'text', required: true },
       { name: 'category', label: 'Category', type: 'select', options: ['Whisky', 'Rum', 'Vodka', 'Gin', 'Beer', 'Wine', 'Brandy', 'Other'] },
-      { name: 'status', label: 'Status', type: 'select', options: ['Active', 'Inactive'] }
+      { name: 'status', label: 'Status', type: 'select', options: ['Active', 'Inactive'], defaultValue: 'Active' }
     ]
   },
   brand_mrp: {
@@ -67,10 +70,10 @@ export const moduleConfigs = {
     fields: [
       { name: 'brand_name', label: 'Brand Name', type: 'text', required: true, lookup: 'brand' },
       { name: 'category', label: 'Category', type: 'select', options: ['Whisky', 'Rum', 'Vodka', 'Gin', 'Beer', 'Wine', 'Brandy', 'Other'] },
-      { name: 'bottle_size', label: 'Bottle Size', type: 'select', options: ['90ml', '180ml', '375ml', '500ml', '650ml', '750ml', '1L'] },
+      { name: 'bottle_size', label: 'Bottle Size', type: 'select', options: ['750ml', '500ml', '375ml', '180ml', '90ml'] },
       { name: 'mrp', label: 'MRP', type: 'number', step: '0.01' },
       { name: 'effective_month', label: 'Effective Month', type: 'month', required: true },
-      { name: 'status', label: 'Status', type: 'select', options: ['Active', 'Inactive'] }
+      { name: 'status', label: 'Status', type: 'select', options: ['Active', 'Inactive'], defaultValue: 'Active' }
     ]
   },
   sss_sales_entries: {
@@ -87,7 +90,7 @@ export const moduleConfigs = {
       { name: 'area', label: 'Area', type: 'text' },
       { name: 'retail_name', label: 'Retail / Shop Name', type: 'text', required: true, lookup: 'retailer' },
       { name: 'brand_name', label: 'Brand Name', type: 'text', required: true, lookup: 'brand' },
-      { name: 'bottle_size', label: 'Bottle Size', type: 'select', options: ['90ml', '180ml', '375ml', '500ml', '650ml', '750ml', '1L'] },
+      { name: 'bottle_size', label: 'Bottle Size', type: 'select', options: ['750ml', '500ml', '375ml', '180ml', '90ml'] },
       { name: 'quantity_sold', label: 'Quantity Sold', type: 'number', step: '0.01' },
       { name: 'total_cases', label: 'Total Cases', type: 'number', readOnly: true, formula: 'quantity_sold / 12' },
       { name: 'category', label: 'Category', type: 'select', options: ['Whisky', 'Rum', 'Vodka', 'Gin', 'Beer', 'Wine', 'Brandy', 'Other'] },
@@ -108,9 +111,9 @@ export const moduleConfigs = {
       { name: 'executive_name', label: 'Executive Name', type: 'text' },
       { name: 'category', label: 'Category', type: 'select', options: ['Whisky', 'Rum', 'Vodka', 'Gin', 'Beer', 'Wine', 'Brandy', 'Other'] },
       { name: 'depot', label: 'Depot', type: 'text' },
-      { name: 'status', label: 'Status', type: 'select', options: ['Active', 'Inactive'] },
+      { name: 'status', label: 'Status', type: 'select', options: ['Active', 'Inactive'], defaultValue: 'Active' },
       { name: 'brand_name', label: 'Brand Name', type: 'text', required: true, lookup: 'brand' },
-      { name: 'availability_status', label: 'Availability Status', type: 'select', options: ['Available', 'Not Available', 'Low Stock', 'Not Asked'] },
+      { name: 'availability_status', label: 'Availability Status', type: 'select', options: ['Available', 'Not Available', 'Low Stock', 'Not Asked'], defaultValue: 'Not Asked' },
       { name: 'remarks', label: 'Remarks', type: 'textarea', wide: true }
     ]
   },
@@ -147,7 +150,7 @@ export const moduleConfigs = {
       { name: 'month', label: 'Month', type: 'month', required: true },
       { name: 'retail_name', label: 'Retail / Shop Name', type: 'text', required: true, lookup: 'retailer' },
       { name: 'brand_name', label: 'Brand Name', type: 'text', required: true, lookup: 'brand' },
-      { name: 'bottle_size', label: 'Bottle Size', type: 'select', options: ['90ml', '180ml', '375ml', '500ml', '650ml', '750ml', '1L'] },
+      { name: 'bottle_size', label: 'Bottle Size', type: 'select', options: ['750ml', '500ml', '375ml', '180ml', '90ml'] },
       { name: 'opening_stock_quantity', label: 'Opening Stock Quantity', type: 'number', step: '0.01' },
       { name: 'opening_stock_cases', label: 'Opening Stock Cases', type: 'number', step: '0.01' },
       { name: 'remarks', label: 'Remarks', type: 'textarea', wide: true }
@@ -197,7 +200,7 @@ export const moduleConfigs = {
       { name: 'date', label: 'Date', type: 'date' },
       { name: 'retail_name', label: 'Retail / Shop Name', type: 'text', required: true, lookup: 'retailer' },
       { name: 'brand_name', label: 'Brand Name', type: 'text', required: true, lookup: 'brand' },
-      { name: 'bottle_size', label: 'Bottle Size', type: 'select', options: ['90ml', '180ml', '375ml', '500ml', '650ml', '750ml', '1L'] },
+      { name: 'bottle_size', label: 'Bottle Size', type: 'select', options: ['750ml', '500ml', '375ml', '180ml', '90ml'] },
       { name: 'quantity_sold', label: 'Quantity Sold', type: 'number', step: '0.01' },
       { name: 'total_cases', label: 'Total Cases', type: 'number', readOnly: true }
     ]
@@ -213,13 +216,14 @@ export const moduleConfigs = {
     fields: [
       { name: 'visit_date', label: 'Visit Date', type: 'date', required: true },
       { name: 'retail_name', label: 'Retail / Shop Name', type: 'text', required: true, lookup: 'retailer' },
+      { name: 'brand_name', label: 'Brand Name', type: 'text', lookup: 'brand' },
       { name: 'executive_name', label: 'Executive Name', type: 'text' },
       { name: 'area', label: 'Area', type: 'text' },
       { name: 'visit_purpose', label: 'Visit Purpose', type: 'text' },
       { name: 'notes', label: 'Notes', type: 'textarea', wide: true },
       { name: 'photo_url', label: 'Photo URL', type: 'photo', wide: true },
       { name: 'next_follow_up_date', label: 'Next Follow-up Date', type: 'date' },
-      { name: 'status', label: 'Status', type: 'select', options: ['Open', 'Follow-up Needed', 'Closed'] }
+      { name: 'status', label: 'Status', type: 'select', options: ['Completed', 'Pending', 'Follow-up Required'], defaultValue: 'Pending' }
     ]
   },
   pjp_entries: {
@@ -236,7 +240,8 @@ export const moduleConfigs = {
       { name: 'executive_name', label: 'Executive Name', type: 'text' },
       { name: 'area', label: 'Area', type: 'text' },
       { name: 'planned_retail_name', label: 'Planned Retail Name', type: 'text', required: true, lookup: 'retailer' },
-      { name: 'visit_status', label: 'Visit Status', type: 'select', options: ['Planned', 'Visited', 'Missed'] },
+      { name: 'brand_name', label: 'Brand Name', type: 'text', lookup: 'brand' },
+      { name: 'visit_status', label: 'Visit Status', type: 'select', options: ['Planned', 'Visited', 'Missed'], defaultValue: 'Planned' },
       { name: 'remarks', label: 'Remarks', type: 'textarea', wide: true }
     ]
   }
@@ -245,3 +250,9 @@ export const moduleConfigs = {
 export const navModules = Object.entries(moduleConfigs).map(([key, config]) => ({ key, ...config }));
 
 export const quickModules = navModules.filter((module) => module.key !== 'brands');
+
+export const utilityPages = [
+  { path: '/import-data', title: 'Import Data', shortTitle: 'Import Data', icon: Upload },
+  { path: '/report-templates', title: 'Report Templates', shortTitle: 'Report Templates', icon: LayoutTemplate },
+  { path: '/help', title: 'Help / Usage Guide', shortTitle: 'Help', icon: CircleHelp }
+];
