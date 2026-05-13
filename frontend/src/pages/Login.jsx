@@ -55,7 +55,7 @@ export default function Login() {
                 <LockKeyhole size={22} />
               </div>
               <div>
-                <h2 className="text-xl font-bold">Admin Login</h2>
+                <h2 className="text-xl font-bold">Account Login</h2>
                 <p className="text-sm text-slate-500">Sign in to your account.</p>
               </div>
             </div>

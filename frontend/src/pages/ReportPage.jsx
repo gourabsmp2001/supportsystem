@@ -8,13 +8,18 @@ import SearchFilter from '../components/SearchFilter';
 import { toast } from '../components/Toast';
 import { invalidateEntityCache, useEntityOptions } from '../hooks/useEntityOptions';
 import { calculateRecord } from '../lib/calculations';
-import { downloadExcel } from '../lib/exportExcel';
+import { downloadExcel, downloadSizeColumnReport } from '../lib/exportExcel';
 import { currentMonth } from '../lib/format';
 import { supabase } from '../lib/supabaseClient';
+import WideReportPage from './WideReportPage';
 
 const hiddenColumns = new Set(['photo_path', 'visit_month']);
 
-export default function ReportPage({ moduleKey, config }) {
+export default function ReportPage({ moduleKey, config, profile, session }) {
+  if (['sss_sales_entries', 'availability_entries', 'spot_promotion_entries'].includes(moduleKey)) {
+    return <WideReportPage moduleKey={moduleKey} config={config} profile={profile} session={session} />;
+  }
+
   const Icon = config.icon;
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -90,6 +95,10 @@ export default function ReportPage({ moduleKey, config }) {
     delete payload.created_at;
     delete payload.updated_at;
 
+    if (!editing && session?.user?.id) {
+      payload.created_by = session.user.id;
+    }
+
     const request = editing
       ? supabase.from(moduleKey).update(payload).eq('id', editing.id)
       : supabase.from(moduleKey).insert(payload);
@@ -143,6 +152,16 @@ export default function ReportPage({ moduleKey, config }) {
   }
 
   function exportRows() {
+    if (moduleKey === 'opening_stock_entries') {
+      downloadSizeColumnReport({ title: config.title, rows, month: filterValue, filenamePrefix: 'opening-stock', stock: true });
+      toast.success('Excel file downloaded!');
+      return;
+    }
+    if (moduleKey === 'brand_mrp') {
+      downloadSizeColumnReport({ title: config.title, rows, month: filterValue, filenamePrefix: 'brand-mrp', mrp: true });
+      toast.success('Excel file downloaded!');
+      return;
+    }
     downloadExcel({ title: config.title, columns, rows, month: filterValue });
     toast.success('Excel file downloaded!');
   }
@@ -203,6 +222,7 @@ export default function ReportPage({ moduleKey, config }) {
           rows={rows}
           onEdit={openEdit}
           onDelete={deleteRecord}
+          canDelete={profile?.role === 'admin'}
           emptyMessage="No entries found. Add a new entry or generate a template."
         />
       )}

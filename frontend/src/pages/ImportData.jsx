@@ -6,7 +6,10 @@ import {
   importSummary,
   prepareBrandRows,
   prepareMrpRows,
+  prepareOpeningStockRows,
   prepareRetailRows,
+  prepareSpotPromotionRows,
+  prepareSssRows,
   readWorkbookRows,
   readyRecords
 } from '../lib/importData';
@@ -35,6 +38,7 @@ const importConfigs = {
     prepare: (rows, existing) => prepareBrandRows(rows, existing.map((row) => row.brand_name)),
     columns: [
       ['brand_name', 'Brand Name'],
+      ['report_code', 'Report Code'],
       ['category', 'Category'],
       ['status', 'Status']
     ]
@@ -47,10 +51,66 @@ const importConfigs = {
     columns: [
       ['brand_name', 'Brand Name'],
       ['category', 'Category'],
-      ['bottle_size', 'Bottle Size'],
-      ['mrp', 'MRP'],
+      ['mrp_750ml', '750 ml MRP'],
+      ['mrp_500ml', '500 ml MRP'],
+      ['mrp_375ml', '375 ml MRP'],
+      ['mrp_180ml', '180 ml MRP'],
+      ['mrp_90ml', '90 ml MRP'],
       ['effective_month', 'Effective Month'],
       ['status', 'Status']
+    ]
+  },
+  sss_sales_entries: {
+    title: 'Import SSS/Sales Entries',
+    table: 'sss_sales_entries',
+    existingQuery: () => supabase.from('sss_sales_entries').select('month,retail_name,brand_name'),
+    prepare: prepareSssRows,
+    columns: [
+      ['month', 'Month'],
+      ['retail_name', 'Retail Name'],
+      ['brand_name', 'Brand Name'],
+      ['qty_750ml', '750 ml'],
+      ['qty_500ml', '500 ml'],
+      ['qty_375ml', '375 ml'],
+      ['qty_180ml', '180 ml'],
+      ['qty_90ml', '90 ml'],
+      ['rum_market_share', 'Rum Market Share'],
+      ['remarks', 'Remarks']
+    ]
+  },
+  spot_promotion_entries: {
+    title: 'Import Spot Promotion Sales',
+    table: 'spot_promotion_entries',
+    existingQuery: () => supabase.from('spot_promotion_entries').select('month,date,retail_name,brand_name'),
+    prepare: prepareSpotPromotionRows,
+    columns: [
+      ['month', 'Month'],
+      ['date', 'Date'],
+      ['retail_name', 'Retail Name'],
+      ['brand_name', 'Brand Name'],
+      ['qty_750ml', '750 ml'],
+      ['qty_500ml', '500 ml'],
+      ['qty_375ml', '375 ml'],
+      ['qty_180ml', '180 ml'],
+      ['qty_90ml', '90 ml'],
+      ['remarks', 'Remarks']
+    ]
+  },
+  opening_stock_entries: {
+    title: 'Import Opening Stock',
+    table: 'opening_stock_entries',
+    existingQuery: () => supabase.from('opening_stock_entries').select('month,retail_name,brand_name'),
+    prepare: prepareOpeningStockRows,
+    columns: [
+      ['month', 'Month'],
+      ['retail_name', 'Retail Name'],
+      ['brand_name', 'Brand Name'],
+      ['stock_750ml', '750 ml Stock'],
+      ['stock_500ml', '500 ml Stock'],
+      ['stock_375ml', '375 ml Stock'],
+      ['stock_180ml', '180 ml Stock'],
+      ['stock_90ml', '90 ml Stock'],
+      ['remarks', 'Remarks']
     ]
   }
 };

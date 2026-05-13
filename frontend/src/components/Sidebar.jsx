@@ -1,8 +1,21 @@
-import { Database, LogOut, Menu, ShieldCheck, X } from 'lucide-react';
+import { Database, LogOut, Menu, ShieldCheck, Users, X } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { navModules, utilityPages } from '../data/modules';
 
-export default function Sidebar({ open, onClose, onToggle, onLogout }) {
+const employeeModuleKeys = new Set([
+  'sss_sales_entries',
+  'availability_entries',
+  'spot_promotion_entries',
+  'retail_visit_entries',
+  'pjp_entries'
+]);
+
+export default function Sidebar({ open, onClose, onToggle, onLogout, profile, session }) {
+  const isAdmin = profile?.role === 'admin';
+  const visibleModules = isAdmin ? navModules : navModules.filter((module) => employeeModuleKeys.has(module.key));
+  const visibleUtilities = isAdmin ? utilityPages : utilityPages.filter((page) => page.path === '/help');
+  const displayName = profile?.full_name || session?.user?.email || 'Signed in';
+
   return (
     <>
       <button
@@ -25,6 +38,13 @@ export default function Sidebar({ open, onClose, onToggle, onLogout }) {
               <p className="text-xs font-medium text-slate-500">Liquor sales reporting</p>
             </div>
           </NavLink>
+          <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-3">
+            <p className="truncate text-sm font-bold text-ink">{displayName}</p>
+            <p className="truncate text-xs text-slate-500">{session?.user?.email}</p>
+            <span className={`mt-2 inline-flex rounded px-2 py-1 text-xs font-bold uppercase ${isAdmin ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}`}>
+              {isAdmin ? 'Admin' : 'Employee'}
+            </span>
+          </div>
         </div>
 
         <nav className="table-scroll flex-1 space-y-1 overflow-y-auto px-3 py-4">
@@ -41,7 +61,7 @@ export default function Sidebar({ open, onClose, onToggle, onLogout }) {
             <ShieldCheck size={18} />
             Dashboard
           </NavLink>
-          {navModules.map(({ key, path, shortTitle, icon: Icon }) => (
+          {visibleModules.map(({ key, path, shortTitle, icon: Icon }) => (
             <NavLink
               key={key}
               to={path}
@@ -59,7 +79,7 @@ export default function Sidebar({ open, onClose, onToggle, onLogout }) {
 
           <hr className="my-3 border-slate-200" />
 
-          {utilityPages.map(({ path, shortTitle, icon: Icon }) => (
+          {visibleUtilities.map(({ path, shortTitle, icon: Icon }) => (
             <NavLink
               key={path}
               to={path}
@@ -75,18 +95,34 @@ export default function Sidebar({ open, onClose, onToggle, onLogout }) {
             </NavLink>
           ))}
 
-          <NavLink
-            to="/backup"
-            onClick={onClose}
-            className={({ isActive }) =>
-              `flex items-center gap-3 rounded-md px-3 py-2 text-sm font-semibold ${
-                isActive ? 'bg-red-700 text-white' : 'text-slate-700 hover:bg-slate-100'
-              }`
-            }
-          >
-            <Database size={18} />
-            Backup & Archive
-          </NavLink>
+          {isAdmin ? (
+            <>
+              <NavLink
+                to="/employees"
+                onClick={onClose}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 rounded-md px-3 py-2 text-sm font-semibold ${
+                    isActive ? 'bg-red-700 text-white' : 'text-slate-700 hover:bg-slate-100'
+                  }`
+                }
+              >
+                <Users size={18} />
+                Employees
+              </NavLink>
+              <NavLink
+                to="/backup"
+                onClick={onClose}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 rounded-md px-3 py-2 text-sm font-semibold ${
+                    isActive ? 'bg-red-700 text-white' : 'text-slate-700 hover:bg-slate-100'
+                  }`
+                }
+              >
+                <Database size={18} />
+                Backup & Archive
+              </NavLink>
+            </>
+          ) : null}
         </nav>
 
         <div className="border-t border-slate-200 p-3">

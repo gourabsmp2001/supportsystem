@@ -1,7 +1,7 @@
 import { Edit2, Trash2 } from 'lucide-react';
 import { formatValue } from '../lib/format';
 
-export default function DataTable({ columns, rows, onEdit, onDelete, emptyMessage = 'No records found.' }) {
+export default function DataTable({ columns, rows, onEdit, onDelete, emptyMessage = 'No records found.', canDelete = true }) {
   return (
     <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-soft">
       <div className="table-scroll overflow-x-auto">
@@ -35,9 +35,11 @@ export default function DataTable({ columns, rows, onEdit, onDelete, emptyMessag
                     <button className="mr-2 rounded-md p-2 text-slate-500 hover:bg-amber-50 hover:text-saffron" onClick={() => onEdit(row)} aria-label="Edit">
                       <Edit2 size={17} />
                     </button>
-                    <button className="rounded-md p-2 text-slate-500 hover:bg-red-50 hover:text-red-700" onClick={() => onDelete(row)} aria-label="Delete">
-                      <Trash2 size={17} />
-                    </button>
+                    {canDelete ? (
+                      <button className="rounded-md p-2 text-slate-500 hover:bg-red-50 hover:text-red-700" onClick={() => onDelete(row)} aria-label="Delete">
+                        <Trash2 size={17} />
+                      </button>
+                    ) : null}
                   </td>
                 </tr>
               ))

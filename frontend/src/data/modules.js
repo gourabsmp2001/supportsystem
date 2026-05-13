@@ -55,6 +55,7 @@ export const moduleConfigs = {
     fields: [
       { name: 'brand_id', label: 'Brand ID', type: 'text', required: true },
       { name: 'brand_name', label: 'Brand Name', type: 'text', required: true },
+      { name: 'report_code', label: 'Report Code', type: 'text' },
       { name: 'category', label: 'Category', type: 'select', options: ['Whisky', 'Rum', 'Vodka', 'Gin', 'Beer', 'Wine', 'Brandy', 'Other'] },
       { name: 'status', label: 'Status', type: 'select', options: ['Active', 'Inactive'], defaultValue: 'Active' }
     ]
@@ -70,8 +71,11 @@ export const moduleConfigs = {
     fields: [
       { name: 'brand_name', label: 'Brand Name', type: 'text', required: true, lookup: 'brand' },
       { name: 'category', label: 'Category', type: 'select', options: ['Whisky', 'Rum', 'Vodka', 'Gin', 'Beer', 'Wine', 'Brandy', 'Other'] },
-      { name: 'bottle_size', label: 'Bottle Size', type: 'select', options: ['750ml', '500ml', '375ml', '180ml', '90ml'] },
-      { name: 'mrp', label: 'MRP', type: 'number', step: '0.01' },
+      { name: 'mrp_750ml', label: '750 ml MRP', type: 'number', step: '0.01' },
+      { name: 'mrp_500ml', label: '500 ml MRP', type: 'number', step: '0.01' },
+      { name: 'mrp_375ml', label: '375 ml MRP', type: 'number', step: '0.01' },
+      { name: 'mrp_180ml', label: '180 ml MRP', type: 'number', step: '0.01' },
+      { name: 'mrp_90ml', label: '90 ml MRP', type: 'number', step: '0.01' },
       { name: 'effective_month', label: 'Effective Month', type: 'month', required: true },
       { name: 'status', label: 'Status', type: 'select', options: ['Active', 'Inactive'], defaultValue: 'Active' }
     ]
@@ -90,9 +94,13 @@ export const moduleConfigs = {
       { name: 'area', label: 'Area', type: 'text' },
       { name: 'retail_name', label: 'Retail / Shop Name', type: 'text', required: true, lookup: 'retailer' },
       { name: 'brand_name', label: 'Brand Name', type: 'text', required: true, lookup: 'brand' },
-      { name: 'bottle_size', label: 'Bottle Size', type: 'select', options: ['750ml', '500ml', '375ml', '180ml', '90ml'] },
-      { name: 'quantity_sold', label: 'Quantity Sold', type: 'number', step: '0.01' },
-      { name: 'total_cases', label: 'Total Cases', type: 'number', readOnly: true, formula: 'quantity_sold / 12' },
+      { name: 'qty_750ml', label: '750 ml Quantity', type: 'number', step: '0.01' },
+      { name: 'qty_500ml', label: '500 ml Quantity', type: 'number', step: '0.01' },
+      { name: 'qty_375ml', label: '375 ml Quantity', type: 'number', step: '0.01' },
+      { name: 'qty_180ml', label: '180 ml Quantity', type: 'number', step: '0.01' },
+      { name: 'qty_90ml', label: '90 ml Quantity', type: 'number', step: '0.01' },
+      { name: 'total_bottles', label: 'Total Bottles', type: 'number', readOnly: true },
+      { name: 'total_cases', label: 'Total Cases', type: 'number', readOnly: true },
       { name: 'category', label: 'Category', type: 'select', options: ['Whisky', 'Rum', 'Vodka', 'Gin', 'Beer', 'Wine', 'Brandy', 'Other'] },
       { name: 'remarks', label: 'Remarks', type: 'textarea', wide: true }
     ]
@@ -143,8 +151,6 @@ export const moduleConfigs = {
     shortTitle: 'Opening Stock',
     icon: Boxes,
     monthField: 'month',
-    filterField: 'date',
-    filterType: 'date',
     primaryField: 'retail_name',
     description: 'Record date-wise opening stock by brand and bottle size.',
     fields: [
@@ -152,9 +158,13 @@ export const moduleConfigs = {
       { name: 'month', label: 'Month', type: 'month', required: true },
       { name: 'retail_name', label: 'Retail / Shop Name', type: 'text', required: true, lookup: 'retailer' },
       { name: 'brand_name', label: 'Brand Name', type: 'text', required: true, lookup: 'brand' },
-      { name: 'bottle_size', label: 'Bottle Size', type: 'select', options: ['750ml', '500ml', '375ml', '180ml', '90ml'] },
-      { name: 'opening_stock_quantity', label: 'Opening Stock Quantity', type: 'number', step: '0.01' },
-      { name: 'opening_stock_cases', label: 'Opening Stock Cases', type: 'number', step: '0.01' },
+      { name: 'stock_750ml', label: '750 ml Stock', type: 'number', step: '0.01' },
+      { name: 'stock_500ml', label: '500 ml Stock', type: 'number', step: '0.01' },
+      { name: 'stock_375ml', label: '375 ml Stock', type: 'number', step: '0.01' },
+      { name: 'stock_180ml', label: '180 ml Stock', type: 'number', step: '0.01' },
+      { name: 'stock_90ml', label: '90 ml Stock', type: 'number', step: '0.01' },
+      { name: 'total_stock_bottles', label: 'Total Stock Bottles', type: 'number', readOnly: true },
+      { name: 'total_stock_cases', label: 'Total Stock Cases', type: 'number', readOnly: true },
       { name: 'remarks', label: 'Remarks', type: 'textarea', wide: true }
     ]
   },
@@ -184,27 +194,21 @@ export const moduleConfigs = {
     shortTitle: 'Spot Promotion',
     icon: BarChart3,
     monthField: 'month',
-    primaryField: 'promoter_name',
-    description: 'Promoter payment, working days, and daily sales reporting.',
+    primaryField: 'retail_name',
+    description: 'Daily shop-wise spot promotion sales reporting.',
     fields: [
-      { name: 'promoter_name', label: 'Promoter Name', type: 'text', required: true },
-      { name: 'bank_name', label: 'Bank Name', type: 'text' },
-      { name: 'branch', label: 'Branch', type: 'text' },
-      { name: 'account_number', label: 'Account Number', type: 'text' },
-      { name: 'ifsc', label: 'IFSC', type: 'text' },
-      { name: 'pan', label: 'PAN', type: 'text' },
       { name: 'month', label: 'Month', type: 'month', required: true },
-      { name: 'total_month_days', label: 'Total Month Days', type: 'number', step: '0.01' },
-      { name: 'leave_days', label: 'Leave Days', type: 'number', step: '0.01' },
-      { name: 'actual_working_days', label: 'Actual Working Days', type: 'number', readOnly: true },
-      { name: 'daily_rate', label: 'Daily Rate', type: 'number', step: '0.01' },
-      { name: 'total_payable_amount', label: 'Total Payable Amount', type: 'number', readOnly: true },
       { name: 'date', label: 'Date', type: 'date' },
       { name: 'retail_name', label: 'Retail / Shop Name', type: 'text', required: true, lookup: 'retailer' },
       { name: 'brand_name', label: 'Brand Name', type: 'text', required: true, lookup: 'brand' },
-      { name: 'bottle_size', label: 'Bottle Size', type: 'select', options: ['750ml', '500ml', '375ml', '180ml', '90ml'] },
-      { name: 'quantity_sold', label: 'Quantity Sold', type: 'number', step: '0.01' },
-      { name: 'total_cases', label: 'Total Cases', type: 'number', readOnly: true }
+      { name: 'qty_750ml', label: '750 ml Quantity', type: 'number', step: '0.01' },
+      { name: 'qty_500ml', label: '500 ml Quantity', type: 'number', step: '0.01' },
+      { name: 'qty_375ml', label: '375 ml Quantity', type: 'number', step: '0.01' },
+      { name: 'qty_180ml', label: '180 ml Quantity', type: 'number', step: '0.01' },
+      { name: 'qty_90ml', label: '90 ml Quantity', type: 'number', step: '0.01' },
+      { name: 'total_bottles', label: 'Total Bottles', type: 'number', readOnly: true },
+      { name: 'total_cases', label: 'Total Cases', type: 'number', readOnly: true },
+      { name: 'remarks', label: 'Remarks', type: 'textarea', wide: true }
     ]
   },
   retail_visit_entries: {

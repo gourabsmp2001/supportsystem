@@ -1,6 +1,6 @@
 import { Database, Download, HardDriveDownload, Info, Loader2 } from 'lucide-react';
-import { useMemo, useState } from 'react';
-import MonthFilter from '../components/MonthFilter';
+import { useState } from 'react';
+import CalendarFilter from '../components/CalendarFilter';
 import { toast } from '../components/Toast';
 import { currentMonth } from '../lib/format';
 import { supabase } from '../lib/supabaseClient';
@@ -141,7 +141,7 @@ export default function Backup() {
         <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-end">
           <div className="w-full sm:w-48">
             <label className="mb-1 block">Select Month</label>
-            <MonthFilter value={month} onChange={setMonth} />
+            <CalendarFilter value={month} onChange={setMonth} />
           </div>
           <button
             onClick={() => download('month')}

@@ -8,26 +8,29 @@ import { downloadExcel } from '../lib/exportExcel';
 import { currentMonth } from '../lib/format';
 import { supabase } from '../lib/supabaseClient';
 
-const bottleSizes = ['750ml', '500ml', '375ml', '180ml', '90ml'];
-
 const reportTemplates = {
   sss_sales_entries: {
     title: 'SSS/Sales Template',
     table: 'sss_sales_entries',
     duplicateFields: ['month', 'retail_name', 'brand_name'],
-    defaultRow: { bottle_size: '750ml', quantity_sold: 0 },
+    defaultRow: { qty_750ml: 0, qty_500ml: 0, qty_375ml: 0, qty_180ml: 0, qty_90ml: 0, rum_market_share: 0, remarks: '' },
     columns: [
       { name: 'month', label: 'Month', type: 'month', readOnly: true },
       { name: 'retail_name', label: 'Retail Name', readOnly: true },
       { name: 'brand_name', label: 'Brand Name', readOnly: true },
-      { name: 'bottle_size', label: 'Bottle Size', type: 'select', options: bottleSizes },
-      { name: 'quantity_sold', label: 'Quantity Sold', type: 'number' }
+      { name: 'qty_750ml', label: '750 ml', type: 'number' },
+      { name: 'qty_500ml', label: '500 ml', type: 'number' },
+      { name: 'qty_375ml', label: '375 ml', type: 'number' },
+      { name: 'qty_180ml', label: '180 ml', type: 'number' },
+      { name: 'qty_90ml', label: '90 ml', type: 'number' },
+      { name: 'rum_market_share', label: 'Rum Market Share', type: 'number' },
+      { name: 'remarks', label: 'Remarks', type: 'text' }
     ]
   },
   availability_entries: {
     title: 'Availability Template',
     table: 'availability_entries',
-    duplicateFields: ['month', 'retail_name', 'brand_name'],
+    duplicateFields: ['month', 'date', 'retail_name', 'brand_name'],
     defaultRow: { availability_status: 'Not Asked', remarks: '' },
     columns: [
       { name: 'month', label: 'Month', type: 'month', readOnly: true },
@@ -41,13 +44,44 @@ const reportTemplates = {
     title: 'Opening Stock Template',
     table: 'opening_stock_entries',
     duplicateFields: ['month', 'retail_name', 'brand_name'],
-    defaultRow: { bottle_size: '750ml', opening_stock_quantity: 0 },
+    defaultRow: { stock_750ml: 0, stock_500ml: 0, stock_375ml: 0, stock_180ml: 0, stock_90ml: 0, remarks: '' },
     columns: [
       { name: 'month', label: 'Month', type: 'month', readOnly: true },
       { name: 'retail_name', label: 'Retail Name', readOnly: true },
       { name: 'brand_name', label: 'Brand Name', readOnly: true },
-      { name: 'bottle_size', label: 'Bottle Size', type: 'select', options: bottleSizes },
-      { name: 'opening_stock_quantity', label: 'Opening Stock Quantity', type: 'number' }
+      { name: 'stock_750ml', label: '750 ml Stock', type: 'number' },
+      { name: 'stock_500ml', label: '500 ml Stock', type: 'number' },
+      { name: 'stock_375ml', label: '375 ml Stock', type: 'number' },
+      { name: 'stock_180ml', label: '180 ml Stock', type: 'number' },
+      { name: 'stock_90ml', label: '90 ml Stock', type: 'number' },
+      { name: 'remarks', label: 'Remarks', type: 'text' }
+    ]
+  },
+  spot_promotion_entries: {
+    title: 'Spot Promotion Template',
+    table: 'spot_promotion_entries',
+    duplicateFields: ['month', 'retail_name', 'brand_name'],
+    defaultRow: {
+      date: new Date().toISOString().slice(0, 10),
+      promoter_name: 'Spot Promotion',
+      qty_750ml: 0,
+      qty_500ml: 0,
+      qty_375ml: 0,
+      qty_180ml: 0,
+      qty_90ml: 0,
+      remarks: ''
+    },
+    columns: [
+      { name: 'month', label: 'Month', type: 'month', readOnly: true },
+      { name: 'date', label: 'Date', type: 'date' },
+      { name: 'retail_name', label: 'Retail Name', readOnly: true },
+      { name: 'brand_name', label: 'Brand Name', readOnly: true },
+      { name: 'qty_750ml', label: '750 ml', type: 'number' },
+      { name: 'qty_500ml', label: '500 ml', type: 'number' },
+      { name: 'qty_375ml', label: '375 ml', type: 'number' },
+      { name: 'qty_180ml', label: '180 ml', type: 'number' },
+      { name: 'qty_90ml', label: '90 ml', type: 'number' },
+      { name: 'remarks', label: 'Remarks', type: 'text' }
     ]
   },
   scheme_projections: {
@@ -75,18 +109,18 @@ const excelTemplates = [
   },
   {
     title: 'Brand List Import Template',
-    columns: ['brand_name', 'category', 'status'],
-    sample: { brand_name: 'Sample Whisky', category: 'Whisky', status: 'Active' }
+    columns: ['brand_name', 'report_code', 'category', 'status'],
+    sample: { brand_name: 'Golden Oak', report_code: 'GOAK', category: 'Whisky', status: 'Active' }
   },
   {
     title: 'Brand MRP Import Template',
-    columns: ['brand_name', 'category', 'bottle_size', 'mrp', 'effective_month', 'status'],
-    sample: { brand_name: 'Sample Whisky', category: 'Whisky', bottle_size: '750ml', mrp: 750, effective_month: currentMonth(), status: 'Active' }
+    columns: ['brand_name', 'category', 'mrp_750ml', 'mrp_500ml', 'mrp_375ml', 'mrp_180ml', 'mrp_90ml', 'effective_month', 'status'],
+    sample: { brand_name: 'Sample Whisky', category: 'Whisky', mrp_750ml: 750, mrp_500ml: 520, mrp_375ml: 390, mrp_180ml: 190, mrp_90ml: 95, effective_month: currentMonth(), status: 'Active' }
   },
   {
     title: 'SSS/Sales Entry Template',
-    columns: ['month', 'retail_name', 'brand_name', 'bottle_size', 'quantity_sold'],
-    sample: { month: currentMonth(), retail_name: 'ABC Wine Shop', brand_name: 'Sample Whisky', bottle_size: '750ml', quantity_sold: 12 }
+    columns: ['month', 'retail_name', 'brand_name', 'qty_750ml', 'qty_500ml', 'qty_375ml', 'qty_180ml', 'qty_90ml', 'rum_market_share', 'remarks'],
+    sample: { month: currentMonth(), retail_name: 'ABC Wine Shop', brand_name: 'Sample Whisky', qty_750ml: 12, qty_500ml: 0, qty_375ml: 0, qty_180ml: 0, qty_90ml: 0, rum_market_share: 0, remarks: '' }
   },
   {
     title: 'Availability Entry Template',
@@ -95,8 +129,8 @@ const excelTemplates = [
   },
   {
     title: 'Opening Stock Template',
-    columns: ['month', 'retail_name', 'brand_name', 'bottle_size', 'opening_stock_quantity'],
-    sample: { month: currentMonth(), retail_name: 'ABC Wine Shop', brand_name: 'Sample Whisky', bottle_size: '750ml', opening_stock_quantity: 24 }
+    columns: ['month', 'retail_name', 'brand_name', 'stock_750ml', 'stock_500ml', 'stock_375ml', 'stock_180ml', 'stock_90ml', 'remarks'],
+    sample: { month: currentMonth(), retail_name: 'ABC Wine Shop', brand_name: 'Sample Whisky', stock_750ml: 24, stock_500ml: 0, stock_375ml: 0, stock_180ml: 0, stock_90ml: 0, remarks: '' }
   },
   {
     title: 'Scheme Projection Template',
@@ -105,8 +139,8 @@ const excelTemplates = [
   },
   {
     title: 'Spot Promotion Template',
-    columns: ['promoter_name', 'month', 'date', 'retail_name', 'brand_name', 'bottle_size', 'quantity_sold', 'daily_rate'],
-    sample: { promoter_name: 'Promoter Name', month: currentMonth(), date: new Date().toISOString().slice(0, 10), retail_name: 'ABC Wine Shop', brand_name: 'Sample Whisky', bottle_size: '750ml', quantity_sold: 12, daily_rate: 500 }
+    columns: ['month', 'date', 'retail_name', 'brand_name', 'qty_750ml', 'qty_500ml', 'qty_375ml', 'qty_180ml', 'qty_90ml', 'remarks'],
+    sample: { month: currentMonth(), date: new Date().toISOString().slice(0, 10), retail_name: 'ABC Wine Shop', brand_name: 'Sample Whisky', qty_750ml: 12, qty_500ml: 0, qty_375ml: 0, qty_180ml: 0, qty_90ml: 0, remarks: '' }
   },
   {
     title: 'Retail Visit Template',

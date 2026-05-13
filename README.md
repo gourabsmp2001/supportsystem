@@ -19,15 +19,16 @@ No Express backend is required for app usage.
 1. Create a Supabase project.
 2. Open Supabase SQL Editor and run [database/schema.sql](database/schema.sql).
 3. In Supabase Authentication, create an admin user with email and password.
-4. Copy [frontend/.env.example](frontend/.env.example) to `frontend/.env`.
-5. Add:
+4. Copy that auth user's ID, then insert an admin profile as shown in the Role-Based Access section below.
+5. Copy [frontend/.env.example](frontend/.env.example) to `frontend/.env`.
+6. Add:
 
 ```bash
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
 ```
 
-6. Install and run:
+7. Install and run:
 
 ```bash
 cd frontend
@@ -54,7 +55,57 @@ Run the schema to create:
 - `retail_visit_entries`
 - `pjp_entries`
 
-The schema also enables RLS and creates policies for authenticated CRUD access.
+The schema also enables RLS. Admin users can manage all tables. Employee users can read lookup data and can select/insert/update only their own daily report rows.
+
+## Role-Based Access
+
+Security is enforced by Supabase RLS using the `profiles` table and `created_by` columns on report tables. The frontend also hides restricted routes, but RLS is the actual access boundary.
+
+### How to make an admin
+
+1. Supabase Dashboard -> Authentication -> Users -> Add User.
+2. Create the owner/admin email and password.
+3. Copy the auth user ID.
+4. In SQL Editor, run:
+
+```sql
+insert into profiles (id, email, full_name, role, status)
+values ('AUTH_USER_UUID', 'owner@example.com', 'Owner Name', 'admin', 'active')
+on conflict (id) do update
+set role = 'admin',
+    status = 'active',
+    email = excluded.email,
+    full_name = excluded.full_name;
+```
+
+### How to create employee accounts
+
+1. Supabase Dashboard -> Authentication -> Users -> Add User.
+2. Create the employee email/password.
+3. Copy the auth user ID.
+4. Insert or update the employee profile:
+
+```sql
+insert into profiles (id, email, full_name, role, status)
+values ('EMPLOYEE_AUTH_USER_UUID', 'employee1@example.com', 'Employee Name', 'employee', 'active')
+on conflict (id) do update
+set role = 'employee',
+    status = 'active',
+    email = excluded.email,
+    full_name = excluded.full_name;
+```
+
+5. Repeat for all 5 employees.
+
+Employees can login, use daily entry pages, and see only their own submitted rows. They cannot access Import Data, Backup & Archive, Retail List management, Brand Master management, Brand MRP management, all-company dashboard totals, or Employee Management.
+
+To deactivate an employee, set:
+
+```sql
+update profiles
+set status = 'inactive'
+where id = 'EMPLOYEE_AUTH_USER_UUID';
+```
 
 ## Supabase Storage
 
