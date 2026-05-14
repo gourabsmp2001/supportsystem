@@ -26,8 +26,9 @@ function inputNumber(value, onChange) {
       type="number"
       step="0.01"
       min="0"
-      value={value ?? 0}
-      onChange={(event) => onChange(Number(event.target.value))}
+      value={value ?? ''}
+      placeholder="0"
+      onChange={(event) => onChange(event.target.value === '' ? '' : Number(event.target.value))}
       className="min-w-20"
     />
   );
@@ -550,7 +551,7 @@ function SizeGrid({ definitions, data, onChange }) {
                 </td>
                 {sizeKeys.map((size) => (
                   <td key={size} className="px-2 py-2">
-                    {item.sizes.includes(size) ? inputNumber(values[size], (value) => update(item.code, size, value)) : <span className="text-slate-300">-</span>}
+                    {inputNumber(values[size], (value) => update(item.code, size, value))}
                   </td>
                 ))}
                 <td className="px-3 py-2 text-center font-bold">{sumBottles(values)}</td>

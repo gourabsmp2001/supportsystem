@@ -85,7 +85,7 @@ export async function downloadSsReport({ rows, month, executiveName = '', area =
   workbook.creator = 'Support System';
   workbook.created = new Date();
   const sheet = workbook.addWorksheet('SSS Report');
-  const brandWidth = ssReportBrands.reduce((sum, brand) => sum + brand.sizes.length + 2, 0);
+  const brandWidth = ssReportBrands.reduce((sum) => sum + sizeKeys.length + 2, 0);
   const lastColumn = 3 + brandWidth + ssMarketShareCodes.length;
 
   sheet.mergeCells(1, 1, 1, lastColumn);
@@ -105,15 +105,15 @@ export async function downloadSsReport({ rows, month, executiveName = '', area =
   let column = 3;
   ssReportBrands.forEach((brand) => {
     const start = column;
-    const end = column + brand.sizes.length + 1;
+    const end = column + sizeKeys.length + 1;
     sheet.mergeCells(6, start, 6, end);
     sheet.getCell(6, start).value = brand.name;
-    brand.sizes.forEach((size, index) => {
+    sizeKeys.forEach((size, index) => {
       sheet.getCell(7, start + index).value = brand.exportCode || brand.code;
       sheet.getCell(8, start + index).value = size.replace('ml', '');
     });
-    sheet.getCell(7, start + brand.sizes.length).value = 'TTL BTLS';
-    sheet.getCell(8, start + brand.sizes.length).value = 'TTL BTLS';
+    sheet.getCell(7, start + sizeKeys.length).value = 'TTL BTLS';
+    sheet.getCell(8, start + sizeKeys.length).value = 'TTL BTLS';
     sheet.getCell(7, end).value = 'TTL CS';
     sheet.getCell(8, end).value = 'TTL CS';
     column = end + 1;
@@ -128,10 +128,10 @@ export async function downloadSsReport({ rows, month, executiveName = '', area =
 
   rows.forEach((row, rowIndex) => {
     const output = [rowIndex + 1, row.retail_name];
-    const salesData = row.sales_data || {};
+      const salesData = row.sales_data || {};
     ssReportBrands.forEach((brand) => {
       const values = salesData[brand.code] || {};
-      brand.sizes.forEach((size) => output.push(Number(values[size] || 0)));
+      sizeKeys.forEach((size) => output.push(Number(values[size] || 0)));
       output.push(sumBottles(values));
       output.push(sumCases(values));
     });
@@ -181,7 +181,7 @@ export async function downloadSpotPromotionReport({ rows, month }) {
   const sheet = workbook.addWorksheet('Spot Promotion');
   const brands = flattenSpotBrands();
   const totalColumns = ['Total Bottles', 'Total Cases'];
-  const lastColumn = 2 + brands.reduce((sum, brand) => sum + brand.sizes.length, 0) + totalColumns.length;
+  const lastColumn = 2 + brands.reduce((sum) => sum + sizeKeys.length, 0) + totalColumns.length;
   sheet.mergeCells(1, 1, 1, lastColumn);
   sheet.getCell(1, 1).value = `SPOT PROMOTION REPORT ${month || ''}`;
   sheet.getCell(1, 1).font = { bold: true, size: 16 };
@@ -198,10 +198,10 @@ export async function downloadSpotPromotionReport({ rows, month }) {
     const categoryStart = column;
     group.brands.forEach((brand) => {
       const start = column;
-      const end = column + brand.sizes.length - 1;
+      const end = column + sizeKeys.length - 1;
       if (end > start) sheet.mergeCells(4, start, 4, end);
       sheet.getCell(4, start).value = brand.code;
-      brand.sizes.forEach((size, index) => {
+      sizeKeys.forEach((size, index) => {
         sheet.getCell(5, start + index).value = size.replace('ml', '');
       });
       column = end + 1;
@@ -222,7 +222,7 @@ export async function downloadSpotPromotionReport({ rows, month }) {
     brands.forEach((brand) => {
       const values = data?.[brand.category]?.[brand.code] || data?.[brand.code] || {};
       rowGrid[brand.code] = values;
-      brand.sizes.forEach((size) => output.push(Number(values[size] || 0)));
+      sizeKeys.forEach((size) => output.push(Number(values[size] || 0)));
     });
     output.push(row.total_bottles || Object.values(rowGrid).reduce((total, values) => total + sumBottles(values), 0));
     output.push(row.total_cases || Object.values(rowGrid).reduce((total, values) => total + sumCases(values), 0));
